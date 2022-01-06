@@ -109,26 +109,13 @@ namespace AccessSherstnev
         {
 
             DataType[] dataType; //Типы полей
-/*            string[] dataName; //Название поля*/
-/*            List<List<string>> data = new List<List<string>>(); //Хранение информации*/
             string table; //таблица соединения
-/*            string connectionAdress; //Адрес таблицы Access*/
-            //Пример: "Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + AppDomain.CurrentDomain.BaseDirectory + "../" + "../" + "../" + "../" + "Sherstnev_1.accdb'"
-/*            bool notification; //Включение уведомлений об ошибке*/
-/*            OleDbConnection dbConnection;*/
 
 
             public DataAccess(DataType[] dataType, string[] dataName, string table, string connectionAdress, bool notification = false) : base("", dataName, connectionAdress)
             {
                 this.dataType = dataType;
-/*                this.dataName = dataName;*/
                 this.table = table;
-/*                this.connectionAdress = connectionAdress;
-                this.notification = notification;
-                for (int i = 0; i < dataName.Length; i++)
-                {
-                    this.data.Add(new List<string>());
-                }*/
                 get();
             }
 

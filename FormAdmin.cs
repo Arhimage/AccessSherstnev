@@ -261,7 +261,7 @@ namespace AccessSherstnev
 
             string query = "SELECT Спектакли.[Дата спектакля], Спектакли.Бюджет, [Репертуар театра].[Название постановки] FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE(((Спектакли.[Дата спектакля]) Between #" + DateTime.Parse(ДатаС.Text).ToString("dd-MM-yyyy") + "# And #" + DateTime.Parse(ДатаПо.Text).ToString("dd-MM-yyyy") + "#))";
 
-            DataAccessLight dataAccess = new DataAccessLight(query, dataName, connectionAdress);
+            DataAccessLight dataAccess = new DataAccessLight(query, dataName, connectionAdress, true, true);
 
             dataAccess.getDataGrid(ref dataGridView1);
         }

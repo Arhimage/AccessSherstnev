@@ -15,14 +15,14 @@ namespace AccessSherstnev
 
         public class DataAccessLight
         {
-            List<List<string>> data = new List<List<string>>(); //Хранение информации
-            string[] dataName; //Название поля
-            string connectionAdress; //Адрес таблицы Access
-            OleDbConnection dbConnection;
-            bool notification; //Включение уведомлений об ошибке
-            string query;
+            protected List<List<string>> data = new List<List<string>>(); //Хранение информации
+            protected string[] dataName; //Название поля
+            protected string connectionAdress; //Адрес таблицы Access
+            protected OleDbConnection dbConnection;
+            protected bool notification; //Включение уведомлений об ошибке
+            protected string query;
 
-            public DataAccessLight(string query, string[] dataName, string connectionAdress, bool notification)
+            public DataAccessLight(string query, string[] dataName, string connectionAdress, bool connectNow = false, bool notification = false)
             {
                 this.query = query;
                 this.notification = notification;
@@ -32,7 +32,10 @@ namespace AccessSherstnev
                 {
                     this.data.Add(new List<string>());
                 }
-                get();
+                if(connectNow)
+                {
+                    get();
+                }
             }
 
             public void get()
@@ -61,37 +64,76 @@ namespace AccessSherstnev
                 dbConnection.Close();
                 return;
             }
+
+            public DataGridView getDataGrid(ref DataGridView dataGridView)
+            {
+                dataGridView.Rows.Clear();
+                dataGridView.Columns.Clear();
+
+                for (int i = 0; i < this.data.Count; i++)
+                {
+                    dataGridView.Columns.Add("column_" + i.ToString(), dataName[i]);
+                    for (int j = 0; j < this.data[i].Count; j++)
+                    {
+                        if (i == 0)
+                        {
+                            dataGridView.Rows.Add();
+                        }
+                        dataGridView.Rows[j].Cells[i].Value = data[i][j];
+                    }
+                }
+
+                return dataGridView;
+            }
+
+            public void getListBox(ref ListBox listBox)
+            {
+                listBox.Items.Clear();
+                string[] text = new string[this.data[0].Count];
+                for (int i = 0; i < this.data.Count; i++)
+                {
+                    for (int j = 0; j < this.data[i].Count; j++)
+                    {
+                        text[j] += " " + this.data[i][j].ToString() + " ";
+                    }
+                }
+                foreach (string item in text)
+                {
+                    listBox.Items.Add(item);
+                }
+                return;
+            }
         }
 
         public class DataAccess : DataAccessLight
         {
 
             DataType[] dataType; //Типы полей
-            string[] dataName; //Название поля
-            List<List<string>> data = new List<List<string>>(); //Хранение информации
+/*            string[] dataName; //Название поля*/
+/*            List<List<string>> data = new List<List<string>>(); //Хранение информации*/
             string table; //таблица соединения
-            string connectionAdress; //Адрес таблицы Access
+/*            string connectionAdress; //Адрес таблицы Access*/
             //Пример: "Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + AppDomain.CurrentDomain.BaseDirectory + "../" + "../" + "../" + "../" + "Sherstnev_1.accdb'"
-            bool notification; //Включение уведомлений об ошибке
-            OleDbConnection dbConnection;
+/*            bool notification; //Включение уведомлений об ошибке*/
+/*            OleDbConnection dbConnection;*/
 
 
-            public DataAccess(DataType[] dataType, string[] dataName, string table, string connectionAdress, bool notification = false) : base("", dataName, connectionAdress, notification)
+            public DataAccess(DataType[] dataType, string[] dataName, string table, string connectionAdress, bool notification = false) : base("", dataName, connectionAdress)
             {
                 this.dataType = dataType;
-                this.dataName = dataName;
+/*                this.dataName = dataName;*/
                 this.table = table;
-                this.connectionAdress = connectionAdress;
+/*                this.connectionAdress = connectionAdress;
                 this.notification = notification;
                 for (int i = 0; i < dataName.Length; i++)
                 {
                     this.data.Add(new List<string>());
-                }
+                }*/
                 get();
             }
 
 
-            public DataGridView getDataGrid(ref DataGridView dataGridView)
+/*            public DataGridView getDataGrid(ref DataGridView dataGridView)
             {
                 dataGridView.Rows.Clear();
                 dataGridView.Columns.Clear();
@@ -128,7 +170,7 @@ namespace AccessSherstnev
                     listBox.Items.Add(item);
                 }
                 return;
-            }
+            }*/
 
             public List<List<string>> getData()
             {
@@ -145,7 +187,7 @@ namespace AccessSherstnev
                 return (int.Parse(this.data[0][this.data[0].Count() - 1]) + 1).ToString();
             }
 
-            private void get()
+            new private void get()
             {
                 dbConnection = new OleDbConnection(this.connectionAdress);
                 dbConnection.Open();
@@ -342,6 +384,8 @@ namespace AccessSherstnev
 
             public bool delete(string index)
             {
+                dbConnection = new OleDbConnection(this.connectionAdress);
+                dbConnection.Open();
                 DialogResult result = MessageBox.Show("Вы уверены, что хотите удалить запись?", "Подтвердите действие", MessageBoxButtons.YesNo);
 
                 if (result == DialogResult.Yes)

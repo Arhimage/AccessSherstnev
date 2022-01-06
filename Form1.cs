@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
-using System.Data.OleDb;
+
+using static AccessSherstnev.AccessData;
+using static AccessSherstnev.Globals;
+using System.Collections.Generic;
 
 namespace AccessSherstnev
 {
@@ -11,7 +14,6 @@ namespace AccessSherstnev
             InitializeComponent();
         }
 
-        string user_name = "unknown";
         int user_id = 0;
 
         void show(object sender, EventArgs e)
@@ -24,43 +26,31 @@ namespace AccessSherstnev
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + AppDomain.CurrentDomain.BaseDirectory + "../" + "../" + "../" + "../" + "Sherstnev_1.accdb'";//строка оеденения
-            OleDbConnection dbConnection = new OleDbConnection(connectionString);
-            dbConnection.Open();
-            string query = "SELECT Актеры.[Код актера], Актеры.Управляющий FROM Актеры WHERE(((Актеры.Фамилия) = '" + Фамилия.Text +  "') AND((Актеры.Имя) = '" + Имя.Text + "') AND((Актеры.Отчество) = '" + Отчество.Text + "'))";
-            OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
-            OleDbDataReader dbReader = dbCommand.ExecuteReader();
-            if (dbReader.HasRows == false)
-                MessageBox.Show("Проверьте правильность введенных данных!", "Ошибка!");
+            string query = "SELECT Актеры.[Код актера], Актеры.Управляющий FROM Актеры WHERE(((Актеры.Фамилия) = '" + Фамилия.Text + "') AND((Актеры.Имя) = '" + Имя.Text + "') AND((Актеры.Отчество) = '" + Отчество.Text + "'))";
+            string[] dataName = new string[2]
+            {
+                "Код актера",
+                "Управляющий",
+            };
+            DataAccessLight dataAccessLight = new DataAccessLight(query, dataName, connectionAdress, true, false);
+            List<List<string>> data = dataAccessLight.getData();
+            user_id = int.Parse(data[0][0]);
+            string status = data[1][0];
+            if (status == "False")
+            {
+                FormStaff fs = new FormStaff();
+                fs.user_id = user_id.ToString();
+                fs.FormClosed += new FormClosedEventHandler(show);
+                fs.Show();
+                this.Hide();
+            }
             else
             {
-                string status = "";
-                while (dbReader.Read())
-                {
-                    user_name = Фамилия.Text + " " + Имя.Text + " " + Отчество.Text;
-                    user_id = (int)dbReader["Код актера"];
-                    status = dbReader["Управляющий"].ToString();
-                }
-                if (status == "False")
-                {
-                    FormStaff fs = new FormStaff();
-                    fs.user_id = user_id.ToString();
-                    fs.FormClosed += new FormClosedEventHandler(show);
-                    fs.Show();
-                    this.Hide();
-                }
-                else
-                {
-                    FormAdmin fa = new FormAdmin();
-                    fa.FormClosed += new FormClosedEventHandler(show);
-                    fa.Show();
-                    this.Hide();
-                }
-
-
+                FormAdmin fa = new FormAdmin();
+                fa.FormClosed += new FormClosedEventHandler(show);
+                fa.Show();
+                this.Hide();
             }
-            dbReader.Close();
-            dbConnection.Close();
         }
 
         private void button2_Click(object sender, EventArgs e)

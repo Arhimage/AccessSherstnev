@@ -41,8 +41,8 @@ namespace AccessSherstnev
             };
             dataInfo = new DataAccessLight(query, dataName, connectionAdress, true, false);
 
-            Название.Text = dataInfo.getData()[0][0];
-            Описание.Text += dataInfo.getData()[1][0];
+            Название.Text = dataInfo.getData()[1][0];
+            Описание.Text += dataInfo.getData()[0][0];
 
             query = "SELECT Спектакли.[Дата спектакля] FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE((([Репертуар театра].Код) = " + filterData + "))";
             dataName = new string[1]

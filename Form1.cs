@@ -44,7 +44,7 @@ namespace AccessSherstnev
                 if (status == "False")
                 {
                     FormStaff fs = new FormStaff();
-                    fs.Text = user_id.ToString();
+                    fs.user_id = user_id.ToString();
                     fs.FormClosed += new FormClosedEventHandler(show);
                     fs.Show();
                     this.Hide();

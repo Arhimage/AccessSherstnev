@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.OleDb;
 using static AccessSherstnev.Enums;
@@ -103,6 +100,11 @@ namespace AccessSherstnev
                 }
                 return;
             }
+
+            public List<List<string>> getData()
+            {
+                return this.data;
+            }
         }
 
         public class DataAccess : DataAccessLight
@@ -117,51 +119,6 @@ namespace AccessSherstnev
                 this.dataType = dataType;
                 this.table = table;
                 get();
-            }
-
-
-/*            public DataGridView getDataGrid(ref DataGridView dataGridView)
-            {
-                dataGridView.Rows.Clear();
-                dataGridView.Columns.Clear();
-
-                for (int i = 0; i < this.data.Count; i++)
-                {
-                    dataGridView.Columns.Add("column_" + i.ToString(), dataName[i]);
-                    for (int j = 0; j < this.data[i].Count; j++)
-                    {
-                        if(i == 0)
-                        {
-                            dataGridView.Rows.Add();
-                        }
-                        dataGridView.Rows[j].Cells[i].Value = data[i][j];
-                    }
-                }
-
-                return dataGridView;
-            }
-
-            public void getListBox(ref ListBox listBox)
-            {
-                listBox.Items.Clear();
-                string[] text = new string[this.data[0].Count];
-                for (int i = 0; i < this.data.Count; i++)
-                {
-                    for (int j = 0; j < this.data[i].Count; j++)
-                    {
-                        text[j] += " " + this.data[i][j].ToString() + " ";
-                    }
-                }
-                foreach (string item in text)
-                {
-                    listBox.Items.Add(item);
-                }
-                return;
-            }*/
-
-            public List<List<string>> getData()
-            {
-                return this.data;
             }
 
             public void updateData()

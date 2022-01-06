@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.OleDb;
-
 using static AccessSherstnev.Globals;
+using static AccessSherstnev.AccessData;
+using System.Collections.Generic;
 
 namespace AccessSherstnev
 {
     public partial class FormData : Form
     {
+        DataAccessLight dataAccessLight;
+
         public FormData()
         {
             InitializeComponent();
@@ -32,37 +28,38 @@ namespace AccessSherstnev
         {
             FormDataExt formDataExt = new FormDataExt();
             string temp = ((sender as Button).Name).ToString();
-            formDataExt.Text = temp.Substring(1);
+            formDataExt.filterData = temp.Substring(1);
             formDataExt.Show(this);
             formDataExt.FormClosed += new FormClosedEventHandler(show);
             this.Hide();
         }
 
-        void getData(Func<String, String, String, Boolean> delegat, bool filter)
+        void getData(string query)
         {
-            OleDbConnection dbConnection = new OleDbConnection(connectionAdress);
-            dbConnection.Open();
-            string query = "SELECT [Репертуар театра].[Название постановки], [Репертуар театра].Код FROM[Репертуар театра]";
-            if (filter)
+            tableLayoutPanel4.Controls.Clear();
+            tableLayoutPanel4.RowCount = 0;
+            string[] dataName = new string[3]
             {
-                query = "SELECT DISTINCT [Репертуар театра].[Название постановки], [Репертуар театра].Код FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE(((Спектакли.[Дата спектакля]) Between #" + DateTime.Parse(ДатаС.Text).ToString("dd-MM-yyyy") + "# And #" + DateTime.Parse(ДатаПо.Text).ToString("dd-MM-yyyy") + "#)); ";
-            }
-            OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
-            OleDbDataReader dbReader = dbCommand.ExecuteReader();
-            if (dbReader.HasRows == false)
-                MessageBox.Show("Данные не найдены!", "Ошибка!");
-            else
+                "Код",
+                "Название постановки",
+                "Ссылка на картинку",
+            };
+            dataAccessLight = new DataAccessLight(query, dataName, connectionAdress, true, true);
+            List<List<string>> data = dataAccessLight.getData();
+            for (int i = 0; i < data[dataName.Length - 1].Count; i++)
             {
-                while (dbReader.Read())
+                if (data[2][i] == "" || data[2][i] == "Неизвестный объект")
                 {
-                    delegat.Invoke(dbReader["Код"].ToString(), dbReader["Название постановки"].ToString(), "C:\\Users\\shers\\Desktop\\2659534639.jpg");
+                    releaseTable(data[0][i], data[1][i]);
+                }
+                else
+                {
+                    releaseTable(data[0][i], data[1][i], data[2][i]);
                 }
             }
-            dbReader.Close();
-            dbConnection.Close();
         }
 
-        bool releaseTable(string number, string name, string imgWay = "C:\\Users\\shers\\Desktop\\2659534639.jpg")
+        bool releaseTable(string number, string name, string imgWay = "https://aspromed.ru/media/thumbs/product_images/fallback_image.jpg.180x180_q85.png")
         {
             Label label = new Label();
             label.Text = name;
@@ -85,11 +82,11 @@ namespace AccessSherstnev
             pictureBox.Dock = DockStyle.Fill;
             try
             {
-                pictureBox.Image = Image.FromFile(imgWay);
+                pictureBox.Load(imgWay);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                
+                pictureBox.Image = Image.FromFile(imgWay);
             }
 
             TableLayoutPanel table = new TableLayoutPanel();
@@ -123,22 +120,7 @@ namespace AccessSherstnev
                 tableLayoutPanel4.RowStyles[tableLayoutPanel4.RowStyles.Count - 1].Height = 270;
             }
             tableLayoutPanel4.Controls.Add(table);
-/*            tableLayoutPanel4.Controls.Count;*/
-
-
-            
             return true;
-        }
-
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void FormData_Load(object sender, EventArgs e)
@@ -146,7 +128,9 @@ namespace AccessSherstnev
             var screen = Screen.FromControl(this);
             this.Top = screen.Bounds.Height / 2 - this.Height / 2;
             this.Left = screen.Bounds.Width / 2 - this.Width / 2;
-            getData(releaseTable, false);
+
+            string query = "SELECT [Репертуар театра].[Название постановки], [Репертуар театра].Код, [Репертуар театра].[Ссылка на картинку] FROM[Репертуар театра]";
+            getData(query);
         }
 
         private void Form_FormClosed(object sender, FormClosedEventArgs e)
@@ -158,7 +142,9 @@ namespace AccessSherstnev
         private void button2_Click(object sender, EventArgs e)
         {
             tableLayoutPanel4.Controls.Clear();
-            getData(releaseTable, true);
+
+            string query = "SELECT DISTINCT [Репертуар театра].[Название постановки], [Репертуар театра].Код, [Репертуар театра].[Ссылка на картинку] FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE(((Спектакли.[Дата спектакля]) Between #" + DateTime.Parse(ДатаС.Text).ToString("dd-MM-yyyy") + "# And #" + DateTime.Parse(ДатаПо.Text).ToString("dd-MM-yyyy") + "#)); ";
+            getData(query);
         }
     }
 }

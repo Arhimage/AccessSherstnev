@@ -1,86 +1,63 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data.OleDb;
+
+using static AccessSherstnev.Globals;
+using static AccessSherstnev.AccessData;
 
 namespace AccessSherstnev
 {
     public partial class FormDataExt : Form
     {
+
+        DataAccessLight dataActers;
+        DataAccessLight dataInfo;
+        DataAccessLight dataDate;
         public FormDataExt()
         {
             InitializeComponent();
         }
 
-        string filterData;
+        public string filterData;
 
-        void getData(string filterData, string typeData)
+        void getData()
         {
-            string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source='" + AppDomain.CurrentDomain.BaseDirectory + "../" + "../" + "../" + "../" + "Sherstnev_1.accdb'";//строка оеденения
-            OleDbConnection dbConnection = new OleDbConnection(connectionString);
-            dbConnection.Open();
-            string query;
-            switch (typeData)
+            string query = "SELECT Актеры.Фамилия, Актеры.Имя, Актеры.Отчество, [Роли в спектаклях].[Название роли] FROM Актеры INNER JOIN(Контракты INNER JOIN ([Репертуар театра] INNER JOIN [Роли в спектаклях] ON[Репертуар театра].Код = [Роли в спектаклях].[Код постановки]) ON Контракты.[Код контракта] = [Роли в спектаклях].[Код контракта]) ON Актеры.[Код актера] = Контракты.[Код актера] WHERE((([Репертуар театра].Код) = " + filterData + ")); ";
+            string[] dataName = new string[4]
             {
-                case "actor":
-                    query = "SELECT Актеры.Фамилия, Актеры.Имя, Актеры.Отчетсво, [Роли в спектаклях].[Название роли] FROM Актеры INNER JOIN(Контракты INNER JOIN ([Репертуар театра] INNER JOIN [Роли в спектаклях] ON[Репертуар театра].Код = [Роли в спектаклях].[Код постановки]) ON Контракты.[Код контракта] = [Роли в спектаклях].[Код контракта]) ON Актеры.[Код актера] = Контракты.[Код актера] WHERE((([Репертуар театра].Код) = " + filterData + "));";
-                    break;
-                case "info":
-                    query = "SELECT [Репертуар театра].[Описание постановки], [Репертуар театра].[Название постановки] FROM[Репертуар театра] WHERE([Репертуар театра].Код = " + filterData + ");";
-                    break;
-                default:
-                    query = "SELECT Спектакли.[Дата спектакля] FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE((([Репертуар театра].Код) = " + filterData + "))";
-                    break;
-            }
-            OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
-            OleDbDataReader dbReader = dbCommand.ExecuteReader();
-            if (dbReader.HasRows == false)
-            {
-                /*                MessageBox.Show("Данные не найдены!", "Ошибка!");*/
+                "Фамилия",
+                "Имя",
+                "Отчество",
+                "Название роли",
+            };
+            dataActers = new DataAccessLight(query, dataName, connectionAdress, true, false);
 
-            }
-            else
+            dataActers.getListBox(ref Роли);
+
+            query = "SELECT [Репертуар театра].[Описание постановки], [Репертуар театра].[Название постановки] FROM[Репертуар театра] WHERE([Репертуар театра].Код = " + filterData + ");";
+            dataName = new string[2]
             {
-                switch (typeData)
-                {
-                    case "actor":
-                        while (dbReader.Read())
-                        {
-                            Роли.Items.Add(dbReader["Фамилия"] + " " + dbReader["Имя"] + " " + dbReader["Отчетсво"] + " в роли '" + dbReader["Название роли"] + "'");
-                        }
-                        break;
-                    case "info":
-                        while (dbReader.Read())
-                        {
-                            Название.Text = dbReader["Название постановки"].ToString();
-                            Описание.Text += dbReader["Описание постановки"];
-                        }
-                        break;
-                    default:
-                        while (dbReader.Read())
-                        {
-                            Сеансы.Items.Add(dbReader["Дата спектакля"]);
-                        }
-                        break;
-                }
-            }
-            dbReader.Close();
-            dbConnection.Close();
+                "Описание постановки",
+                "Название постановки",
+            };
+            dataInfo = new DataAccessLight(query, dataName, connectionAdress, true, false);
+
+            Название.Text = dataInfo.getData()[0][0];
+            Описание.Text += dataInfo.getData()[1][0];
+
+            query = "SELECT Спектакли.[Дата спектакля] FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE((([Репертуар театра].Код) = " + filterData + "))";
+            dataName = new string[1]
+            {
+                "Дата спектакля",
+            };
+            dataDate = new DataAccessLight(query, dataName, connectionAdress, true, false);
+
+            dataDate.getListBox(ref Сеансы);
         }
 
         private void FormDataExt_Load(object sender, EventArgs e)
         {
-            filterData = this.Text;
-            getData(filterData, "actor");
-            getData(filterData, "info");
-            getData(filterData, "dates");
-            this.Text = "Мой театр";
+            getData();
+
             var screen = Screen.FromControl(this);
             this.Top = screen.Bounds.Height / 2 - this.Height / 2;
             this.Left = screen.Bounds.Width / 2 - this.Width / 2;

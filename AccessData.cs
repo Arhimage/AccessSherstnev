@@ -20,9 +20,11 @@ namespace AccessSherstnev
             string connectionAdress; //Адрес таблицы Access
             OleDbConnection dbConnection;
             bool notification; //Включение уведомлений об ошибке
+            string query;
 
             public DataAccessLight(string query, string[] dataName, string connectionAdress, bool notification)
             {
+                this.query = query;
                 this.notification = notification;
                 this.connectionAdress = connectionAdress;
                 this.dataName = dataName;
@@ -30,10 +32,10 @@ namespace AccessSherstnev
                 {
                     this.data.Add(new List<string>());
                 }
-                get(query);
+                get();
             }
 
-            public void get(string query)
+            public void get()
             {
                 dbConnection = new OleDbConnection(this.connectionAdress);
                 dbConnection.Open();
@@ -74,7 +76,7 @@ namespace AccessSherstnev
             OleDbConnection dbConnection;
 
 
-            public DataAccess(DataType[] dataType, string[] dataName, string table, string connectionAdress, bool notification = false) : base("")
+            public DataAccess(DataType[] dataType, string[] dataName, string table, string connectionAdress, bool notification = false) : base("", dataName, connectionAdress, notification)
             {
                 this.dataType = dataType;
                 this.dataName = dataName;
@@ -86,17 +88,6 @@ namespace AccessSherstnev
                     this.data.Add(new List<string>());
                 }
                 get();
-            }
-
-            public DataAccess(string query, string[] dataName, string connectionAdress)
-            {
-                this.connectionAdress = connectionAdress;
-                this.dataName = dataName;
-                for (int i = 0; i < dataName.Length; i++)
-                {
-                    this.data.Add(new List<string>());
-                }
-                get(query);
             }
 
 

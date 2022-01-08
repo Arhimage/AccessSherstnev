@@ -1,35 +1,36 @@
 ﻿using System.Collections.Generic;
+using System.Data.OracleClient;  
 using System.Linq;
 using System.Windows.Forms;
-using System.Data.OleDb;
-using static AccessSherstnev.Enums;
+using System.Data;
+
 using static AccessSherstnev.Globals;
+using static AccessSherstnev.Enums;
 
 namespace AccessSherstnev
 {
-    internal class AccessData
+    internal class OracleData
     {
 
         public class DataAccessLight
         {
             protected List<List<string>> data = new List<List<string>>(); //Хранение информации
             protected string[] dataName; //Название поля
-            protected string connectionAdress; //Адрес таблицы Access
-            protected OleDbConnection dbConnection;
+            protected OracleConnection connectionString; //Данные полдкюлчения
             protected bool notification; //Включение уведомлений об ошибке
             protected string query;
 
-            public DataAccessLight(string query, string[] dataName, string connectionAdress, bool connectNow = false, bool notification = false)
+            public DataAccessLight(string query, string[] dataName, OracleConnection connectionString, bool connectNow = false, bool notification = false)
             {
                 this.query = query;
                 this.notification = notification;
-                this.connectionAdress = connectionAdress;
+                this.connectionString = connectionString;
                 this.dataName = dataName;
                 for (int i = 0; i < dataName.Length; i++)
                 {
                     this.data.Add(new List<string>());
                 }
-                if(connectNow)
+                if (connectNow)
                 {
                     get();
                 }
@@ -37,11 +38,13 @@ namespace AccessSherstnev
 
             public void get()
             {
-                dbConnection = new OleDbConnection(this.connectionAdress);
-                dbConnection.Open();
-                OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
-                OleDbDataReader dbReader = dbCommand.ExecuteReader();
-                if (dbReader.HasRows == false && this.notification)
+                connectionString.Open();
+                OracleCommand dbcmd = new OracleCommand();
+                dbcmd.CommandText = query;
+                dbcmd.Connection = connectionString;
+                dbcmd.CommandType = CommandType.Text;
+                OracleDataReader reader = dbcmd.ExecuteReader();
+                if (reader.HasRows == false && this.notification)
                     notification("Данные не найдены!");
                 else
                 {
@@ -49,16 +52,16 @@ namespace AccessSherstnev
                     {
                         item.Clear();
                     }
-                    while (dbReader.Read())
+                    while (reader.Read())
                     {
                         for (int i = 0; i < this.data.Count; i++)
                         {
-                            this.data[i].Add(dbReader[dataName[i]].ToString());
+                            this.data[i].Add(reader[dataName[i]].ToString());
                         }
                     }
                 }
-                dbReader.Close();
-                dbConnection.Close();
+                reader.Close();
+                connectionString.Close();
                 return;
             }
 
@@ -114,7 +117,7 @@ namespace AccessSherstnev
             string table; //таблица соединения
 
 
-            public DataAccess(DataType[] dataType, string[] dataName, string table, string connectionAdress, bool notification = false) : base("", dataName, connectionAdress)
+            public DataAccess(DataType[] dataType, string[] dataName, string table, OracleConnection connectionString, bool notification = false) : base("", dataName, connectionString)
             {
                 this.dataType = dataType;
                 this.table = table;
@@ -133,12 +136,11 @@ namespace AccessSherstnev
 
             new private void get()
             {
-                dbConnection = new OleDbConnection(this.connectionAdress);
-                dbConnection.Open();
+                connectionString.Open();
                 string selectionFields = "";
                 for (int i = 0; i < this.dataName.Length; i++)
                 {
-                    selectionFields += " [" + this.table + "].[" + this.dataName[i] + "]";
+                    selectionFields += " \"" + this.table + "\".\"" + this.dataName[i] + "\"";
                     if (i < this.dataName.Length - 1)
                     {
                         selectionFields += ", ";
@@ -148,10 +150,13 @@ namespace AccessSherstnev
                         selectionFields += " ";
                     }
                 }
-                string query = "SELECT " + selectionFields + " FROM [" + this.table + "]";
-                OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
-                OleDbDataReader dbReader = dbCommand.ExecuteReader();
-                if (dbReader.HasRows == false && this.notification)
+                string query = "SELECT " + selectionFields + " FROM \"" + this.table + "\"";
+                OracleCommand dbcmd = new OracleCommand(query, connectionString);
+                dbcmd.CommandType = CommandType.Text;
+                OracleDataReader reader = dbcmd.ExecuteReader();
+/*                OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
+                OleDbDataReader dbReader = dbCommand.ExecuteReader();*/
+                if (reader.HasRows == false && this.notification)
                     notification("Данные не найдены!");
                 else
                 {
@@ -159,22 +164,21 @@ namespace AccessSherstnev
                     {
                         item.Clear();
                     }
-                    while (dbReader.Read())
+                    while (reader.Read())
                     {
                         for (int i = 0; i < this.data.Count; i++)
                         {
-                            this.data[i].Add(dbReader[dataName[i]].ToString());
+                            this.data[i].Add(reader[dataName[i]].ToString());
                         }
                     }
                 }
-                dbReader.Close();
-                dbConnection.Close();
+                reader.Close();
                 return;
             }
 
-            public void get(string query)
+/*            public void get(string query)
             {
-                dbConnection = new OleDbConnection(this.connectionAdress);
+                dbConnection = new OleDbConnection(this.connectionString);
                 dbConnection.Open();
                 OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
                 OleDbDataReader dbReader = dbCommand.ExecuteReader();
@@ -197,7 +201,7 @@ namespace AccessSherstnev
                 dbReader.Close();
                 dbConnection.Close();
                 return;
-            }
+            }*/
 
             public bool add(string index)
             {
@@ -245,7 +249,7 @@ namespace AccessSherstnev
                 }
 
                 formChangeAdd.table.RowStyles[formChangeAdd.table.RowStyles.Count - 1].SizeType = SizeType.AutoSize;
-                formChangeAdd.connectionAdress = this.connectionAdress;
+                formChangeAdd.connectionString = this.connectionString;
                 formChangeAdd.operationType = OperationType.ADD;
                 formChangeAdd.dataType = this.dataType;
                 formChangeAdd.Название.Text = "Добавление " + table;
@@ -282,7 +286,7 @@ namespace AccessSherstnev
                             break;
                         case DataType.BOOLEAN:
                             CheckBox checkBox = new CheckBox();
-                            if(data[i][int.Parse(index)] == "True")
+                            if (data[i][int.Parse(index)] == "True")
                             {
                                 checkBox.Checked = true;
                             }
@@ -314,7 +318,7 @@ namespace AccessSherstnev
                 formChangeAdd.table.RowStyles[formChangeAdd.table.RowStyles.Count - 1].SizeType = SizeType.Percent;
                 formChangeAdd.table.RowStyles[formChangeAdd.table.RowStyles.Count - 1].Height = 10;
 
-                formChangeAdd.connectionAdress = this.connectionAdress;
+                formChangeAdd.connectionString = this.connectionString;
                 formChangeAdd.operationType = OperationType.EDIT;
                 formChangeAdd.dataType = this.dataType;
                 formChangeAdd.Название.Text = "Изменение " + table;
@@ -328,19 +332,20 @@ namespace AccessSherstnev
 
             public bool delete(string index)
             {
-                dbConnection = new OleDbConnection(this.connectionAdress);
-                dbConnection.Open();
+                connectionString.Open();
                 DialogResult result = MessageBox.Show("Вы уверены, что хотите удалить запись?", "Подтвердите действие", MessageBoxButtons.YesNo);
 
                 if (result == DialogResult.Yes)
                 {
-                    string query = "DELETE FROM [" + this.table + "] WHERE [" + this.table + "].[" + this.dataName[0] + "] = " + this.data[0][int.Parse(index)] + "; ";
-                    OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
-                    if (dbCommand.ExecuteNonQuery() != 1)
+                    string query = "DELETE FROM \"" + this.table + "\" WHERE \"" + this.table + "\".\"" + this.dataName[0] + "\" = " + this.data[0][int.Parse(index)] + "";
+                    OracleCommand dbcmd = new OracleCommand(query, connectionString);
+                    dbcmd.CommandType = CommandType.Text;
+                    OracleDataReader reader = dbcmd.ExecuteReader();
+                    if (reader.FieldCount != 1)
                         notification("Ошибка выполнения запроса!");
                     else
                         notification("Данные успешно удалены!");
-                    dbConnection.Close();
+                    reader.Close();
                     return true;
                 }
                 else
@@ -351,5 +356,6 @@ namespace AccessSherstnev
             }
 
         }
+
     }
 }

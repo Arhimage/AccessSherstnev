@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using static AccessSherstnev.AccessData;
+using static AccessSherstnev.OracleData;
 using static AccessSherstnev.Enums;
 using static AccessSherstnev.Globals;
 
@@ -63,7 +63,7 @@ namespace AccessSherstnev
 
             string table = "Контракты";
 
-            dataContracts = new DataAccess(dataTypes, dataNames, table, connectionAdress, true);
+            dataContracts = new DataAccess(dataTypes, dataNames, table, connection, true);
 
             dataContracts.getListBox(ref Контракты);
 
@@ -91,7 +91,7 @@ namespace AccessSherstnev
 
             table = "Актеры";
 
-            dataActors = new DataAccess(dataTypes, dataNames, table, connectionAdress, true);
+            dataActors = new DataAccess(dataTypes, dataNames, table, connection, true);
 
             dataActors.getListBox(ref Актеры);
 
@@ -111,7 +111,7 @@ namespace AccessSherstnev
 
             table = "Регалии";
 
-            dataRegalies = new DataAccess(dataTypes, dataNames, table, connectionAdress, true);
+            dataRegalies = new DataAccess(dataTypes, dataNames, table, connection, true);
 
             dataRegalies.getListBox(ref Регалии);
 
@@ -139,7 +139,7 @@ namespace AccessSherstnev
 
             table = "Репертуар театра";
 
-            dataRepertuar = new DataAccess(dataTypes, dataNames, table, connectionAdress, true);
+            dataRepertuar = new DataAccess(dataTypes, dataNames, table, connection, true);
 
             dataRepertuar.getListBox(ref Репертуар);
 
@@ -163,7 +163,7 @@ namespace AccessSherstnev
 
             table = "Спектакли";
 
-            dataPerformance = new DataAccess(dataTypes, dataNames, table, connectionAdress, true);
+            dataPerformance = new DataAccess(dataTypes, dataNames, table, connection, true);
 
             dataPerformance.getListBox(ref Спектакли);
 
@@ -252,7 +252,7 @@ namespace AccessSherstnev
 
             string query = "SELECT Спектакли.[Дата спектакля], Спектакли.Бюджет, [Репертуар театра].[Название постановки] FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE(((Спектакли.[Дата спектакля]) Between #" + DateTime.Parse(ДатаС.Text).ToString("dd-MM-yyyy") + "# And #" + DateTime.Parse(ДатаПо.Text).ToString("dd-MM-yyyy") + "#))";
 
-            DataAccessLight dataAccess = new DataAccessLight(query, dataName, connectionAdress, true, true);
+            DataAccessLight dataAccess = new DataAccessLight(query, dataName, connection, true, true);
 
             dataAccess.getDataGrid(ref dataGridView1);
         }

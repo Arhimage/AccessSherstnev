@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using static AccessSherstnev.Globals;
-using static AccessSherstnev.AccessData;
+using static AccessSherstnev.OracleData;
 using System.Collections.Generic;
 
 namespace AccessSherstnev
@@ -40,11 +40,11 @@ namespace AccessSherstnev
             tableLayoutPanel4.RowCount = 0;
             string[] dataName = new string[3]
             {
-                "Код",
-                "Название постановки",
-                "Ссылка на картинку",
+                "CODE",
+                "NAME OF THE PRODUCTION",
+                "LINK TO THE PICTURE",
             };
-            dataAccessLight = new DataAccessLight(query, dataName, connectionAdress, true, true);
+            dataAccessLight = new DataAccessLight(query, dataName, connection, true, true);
             List<List<string>> data = dataAccessLight.getData();
             for (int i = 0; i < data[dataName.Length - 1].Count; i++)
             {
@@ -129,7 +129,7 @@ namespace AccessSherstnev
             this.Top = screen.Bounds.Height / 2 - this.Height / 2;
             this.Left = screen.Bounds.Width / 2 - this.Width / 2;
 
-            string query = "SELECT [Репертуар театра].[Название постановки], [Репертуар театра].Код, [Репертуар театра].[Ссылка на картинку] FROM[Репертуар театра]";
+            string query = "SELECT \"REPERTOIRE OF THE THEATER\".\"NAME OF THE PRODUCTION\", \"REPERTOIRE OF THE THEATER\".CODE, \"REPERTOIRE OF THE THEATER\".\"LINK TO THE PICTURE\" FROM\"REPERTOIRE OF THE THEATER\"";
             getData(query);
         }
 
@@ -143,7 +143,7 @@ namespace AccessSherstnev
         {
             tableLayoutPanel4.Controls.Clear();
 
-            string query = "SELECT DISTINCT [Репертуар театра].[Название постановки], [Репертуар театра].Код, [Репертуар театра].[Ссылка на картинку] FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE(((Спектакли.[Дата спектакля]) Between #" + DateTime.Parse(ДатаС.Text).ToString("dd-MM-yyyy") + "# And #" + DateTime.Parse(ДатаПо.Text).ToString("dd-MM-yyyy") + "#)); ";
+            string query = "SELECT DISTINCT \"REPERTOIRE OF THE THEATER\".\"NAME OF THE PRODUCTION\", \"REPERTOIRE OF THE THEATER\".\"CODE\", \"REPERTOIRE OF THE THEATER\".\"LINK TO THE PICTURE\" FROM \"REPERTOIRE OF THE THEATER\" INNER JOIN \"PERFORMANCES\" ON \"REPERTOIRE OF THE THEATER\".\"CODE\" = \"PERFORMANCES\".\"PERFORMANCE CODE\" WHERE \"PERFORMANCES\".\"PERFORMANCE DATE\" BETWEEN TO_DATE('" + DateTime.Parse(ДатаС.Text).ToString("yyyy-MM-dd") + "','YYYY-MM-DD') AND TO_DATE('" + DateTime.Parse(ДатаПо.Text).ToString("yyyy-MM-dd") + "','YYYY-MM-DD')";
             getData(query);
         }
     }

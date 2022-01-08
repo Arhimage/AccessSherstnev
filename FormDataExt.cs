@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 
 using static AccessSherstnev.Globals;
-using static AccessSherstnev.AccessData;
+using static AccessSherstnev.OracleData;
 
 namespace AccessSherstnev
 {
@@ -21,35 +21,35 @@ namespace AccessSherstnev
 
         void getData()
         {
-            string query = "SELECT Актеры.Фамилия, Актеры.Имя, Актеры.Отчество, [Роли в спектаклях].[Название роли] FROM Актеры INNER JOIN(Контракты INNER JOIN ([Репертуар театра] INNER JOIN [Роли в спектаклях] ON[Репертуар театра].Код = [Роли в спектаклях].[Код постановки]) ON Контракты.[Код контракта] = [Роли в спектаклях].[Код контракта]) ON Актеры.[Код актера] = Контракты.[Код актера] WHERE((([Репертуар театра].Код) = " + filterData + ")); ";
+            string query = "SELECT \"ACTORS\".\"SURNAME\", \"ACTORS\".\"NAME\", \"ACTORS\".\"PATRONYMIC\", \"ROLES IN PERFORMANCES\".\"ROLE NAME\" FROM \"ACTORS\" INNER JOIN(\"CONTRACTS\" INNER JOIN (\"REPERTOIRE OF THE THEATER\" INNER JOIN \"ROLES IN PERFORMANCES\" ON \"REPERTOIRE OF THE THEATER\".\"CODE\" = \"ROLES IN PERFORMANCES\".\"PRODUCTION CODE\") ON \"CONTRACTS\".\"CONTRACT CODE\" = \"ROLES IN PERFORMANCES\".\"CONTRACT CODE\") ON \"ACTORS\".\"ACTOR CODE\" = \"CONTRACTS\".\"ACTOR CODE\" WHERE(((\"REPERTOIRE OF THE THEATER\".\"CODE\") = " + filterData + "))";
             string[] dataName = new string[4]
             {
-                "Фамилия",
-                "Имя",
-                "Отчество",
-                "Название роли",
+                "SURNAME",
+                "NAME",
+                "PATRONYMIC",
+                "ROLE NAME",
             };
-            dataActers = new DataAccessLight(query, dataName, connectionAdress, true, false);
+            dataActers = new DataAccessLight(query, dataName, connection, true, false);
 
             dataActers.getListBox(ref Роли);
 
-            query = "SELECT [Репертуар театра].[Описание постановки], [Репертуар театра].[Название постановки] FROM[Репертуар театра] WHERE([Репертуар театра].Код = " + filterData + ");";
+            query = "SELECT \"REPERTOIRE OF THE THEATER\".\"DESCRIPTION OF THE PRODUCTION\", \"REPERTOIRE OF THE THEATER\".\"NAME OF THE PRODUCTION\" FROM\"REPERTOIRE OF THE THEATER\" WHERE(\"REPERTOIRE OF THE THEATER\".\"CODE\" = " + filterData + ")";
             dataName = new string[2]
             {
-                "Описание постановки",
-                "Название постановки",
+                "DESCRIPTION OF THE PRODUCTION",
+                "NAME OF THE PRODUCTION",
             };
-            dataInfo = new DataAccessLight(query, dataName, connectionAdress, true, false);
+            dataInfo = new DataAccessLight(query, dataName, connection, true, false);
 
             Название.Text = dataInfo.getData()[1][0];
             Описание.Text += dataInfo.getData()[0][0];
 
-            query = "SELECT Спектакли.[Дата спектакля] FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE((([Репертуар театра].Код) = " + filterData + "))";
+            query = "SELECT \"PERFORMANCES\".\"PERFORMANCE DATE\" FROM \"REPERTOIRE OF THE THEATER\" INNER JOIN \"PERFORMANCES\" ON\"REPERTOIRE OF THE THEATER\".\"CODE\" = \"PERFORMANCES\".\"PRODUCTION CODE\" WHERE(((\"REPERTOIRE OF THE THEATER\".\"CODE\") = " + filterData + "))";
             dataName = new string[1]
             {
-                "Дата спектакля",
+                "PERFORMANCE DATE",
             };
-            dataDate = new DataAccessLight(query, dataName, connectionAdress, true, false);
+            dataDate = new DataAccessLight(query, dataName, connection, true, false);
 
             dataDate.getListBox(ref Сеансы);
         }

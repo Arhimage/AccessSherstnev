@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-using static AccessSherstnev.AccessData;
+using static AccessSherstnev.OracleData;
 using static AccessSherstnev.Globals;
 using System.Collections.Generic;
 
@@ -32,7 +32,7 @@ namespace AccessSherstnev
                 "Код актера",
                 "Управляющий",
             };
-            DataAccessLight dataAccessLight = new DataAccessLight(query, dataName, connectionAdress, true, false);
+            DataAccessLight dataAccessLight = new DataAccessLight(query, dataName, connection, true, false);
             List<List<string>> data = dataAccessLight.getData();
             user_id = int.Parse(data[0][0]);
             string status = data[1][0];

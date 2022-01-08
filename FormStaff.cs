@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-using static AccessSherstnev.AccessData;
+using static AccessSherstnev.OracleData;
 using static AccessSherstnev.Globals;
 
 namespace AccessSherstnev
@@ -26,7 +26,7 @@ namespace AccessSherstnev
                 "Количество спектаклей",
                 "Премия по окончанию",
             };
-            DataAccessLight dataContracts = new DataAccessLight(query, dataName, connectionAdress, true, false);
+            DataAccessLight dataContracts = new DataAccessLight(query, dataName, connection, true, false);
 
             dataContracts.getDataGrid(ref dataGridView1);
 
@@ -35,7 +35,7 @@ namespace AccessSherstnev
             {
                 "Название регалии",
             };
-            DataAccessLight dataRegalies = new DataAccessLight(query, dataName, connectionAdress, true, false);
+            DataAccessLight dataRegalies = new DataAccessLight(query, dataName, connection, true, false);
 
             dataRegalies.getListBox(ref listBox1);
 
@@ -44,7 +44,7 @@ namespace AccessSherstnev
             {
                 "Дата спектакля",
             };
-            DataAccessLight dataDates = new DataAccessLight(query, dataName, connectionAdress, true, false);
+            DataAccessLight dataDates = new DataAccessLight(query, dataName, connection, true, false);
 
             dataDates.getListBox(ref listBox2);
         }

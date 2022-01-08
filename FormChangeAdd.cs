@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
-using System.Data.OleDb;
+using System.Data.OracleClient;
 using static AccessSherstnev.Enums;
 using static AccessSherstnev.Globals;
+using System.Data;
 
 namespace AccessSherstnev
 {
@@ -16,7 +17,7 @@ namespace AccessSherstnev
         public DataType[] dataType;
         public string[] data;
         public OperationType operationType;
-        public string connectionAdress;
+        public OracleConnection connectionString;
         public string index;
         public string tableSave;
         public string[] dataName;
@@ -26,8 +27,7 @@ namespace AccessSherstnev
 
         void addNote()
         {
-            OleDbConnection dbConnection = new OleDbConnection(connectionAdress);//создаем соеденение
-            dbConnection.Open();//открываем соеденение
+            connectionString.Open();
             string saveData = " " + index + ", ";
             for (int i = 0; i < dataType.Length - 1; i++)
             {
@@ -38,13 +38,13 @@ namespace AccessSherstnev
                         saveData += "'" + table.Controls[j].Text + "'";
                         break;
                     case DataType.DATE:
-                        saveData += "#" + DateTime.Parse(table.Controls[j].Text).ToString("dd-MM-yyyy") + "#";
+                        saveData += " TO_DATE('" + DateTime.Parse(table.Controls[j].Text).ToString("yyyy-MM-dd HH:mm:ss") + "', 'YYYY-MM-DD HH24:MI:SS')";
                         break;
                     case DataType.BOOLEAN:
-                        string boolData = "False";
+                        string boolData = "'0'";
                         if (table.Controls[j].ToString() == "System.Windows.Forms.CheckBox, CheckState: 1")
                         {
-                            boolData = "True";
+                            boolData = "'1'";
                         }
                         saveData += " " + boolData + "";
                         break;
@@ -52,7 +52,11 @@ namespace AccessSherstnev
 
                         break;
                     case DataType.NUMBER:
-                        saveData += " " + table.Controls[j].Text + "";
+                        if (table.Controls[j].Text == "")
+                        {
+                            table.Controls[j].Text = "0";
+                        }
+                        saveData += " '" + table.Controls[j].Text + "'";
                         break;
                     default:
                         break;
@@ -62,19 +66,20 @@ namespace AccessSherstnev
                     saveData += ", ";
                 }
             }
-            string query = "INSERT INTO [" + tableSave + "] VALUES (" + saveData + ")";
-            OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
-            if (dbCommand.ExecuteNonQuery() != 1)
+            string query = "INSERT INTO \"" + tableSave + "\" VALUES (" + saveData + ")";
+            OracleCommand dbcmd = new OracleCommand(query, connectionString);
+            dbcmd.CommandType = CommandType.Text;
+            OracleDataReader reader = dbcmd.ExecuteReader();
+            if (reader.FieldCount != 1)
                 notification("Ошибка выполнения запроса!");
             else
                 notification("Данные успешно добавлены!");
-            dbConnection.Close();
+            reader.Close();
         }
 
         private void editNote()
         {
-            OleDbConnection dbConnection = new OleDbConnection(connectionAdress);//создаем соеденение
-            dbConnection.Open();//открываем соеденение
+            connectionString.Open();
             string saveData = "";
             for (int i = 0; i < dataType.Length - 1; i++)
             {
@@ -90,13 +95,13 @@ namespace AccessSherstnev
                         saveData += "'" + table.Controls[j].Text + "'";
                         break;
                     case DataType.DATE:
-                        saveData += "#" + DateTime.Parse(table.Controls[j].Text).ToString("yyyy-MM-dd") + "#";
+                        saveData += " TO_DATE('" + DateTime.Parse(table.Controls[j].Text).ToString("yyyy-MM-dd HH:mm:ss") + "', 'YYYY-MM-DD HH24:MI:SS')";
                         break;
                     case DataType.BOOLEAN:
-                        string boolData = "False";
+                        string boolData = "'0'";
                         if (table.Controls[j].ToString() == "System.Windows.Forms.CheckBox, CheckState: 1")
                         {
-                            boolData = "True";
+                            boolData = "'1'";
                         }
                         saveData += " " + boolData + "";
                         break;
@@ -108,7 +113,7 @@ namespace AccessSherstnev
                         {
                             table.Controls[j].Text = "0";
                         }
-                        saveData += " " + table.Controls[j].Text + "";
+                        saveData += " '" + table.Controls[j].Text + "'";
                         break;
                     default:
                         break;
@@ -118,13 +123,15 @@ namespace AccessSherstnev
                     saveData += ", ";
                 }
             }
-            string query = "UPDATE [" + tableSave + "] SET " + saveData + " WHERE " + "[" + tableSave + "].[" + dataName[0] + "] = " + index;
-            OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
-            if (dbCommand.ExecuteNonQuery() != 1)
+            string query = "UPDATE \"" + tableSave + "\" SET " + saveData + " WHERE " + "\"" + tableSave + "\".\"" + dataName[0] + "\" = " + index;
+            OracleCommand dbcmd = new OracleCommand(query, connectionString);
+            dbcmd.CommandType = CommandType.Text;
+            OracleDataReader reader = dbcmd.ExecuteReader();
+            if (reader.FieldCount != 1)
                 notification("Ошибка выполнения запроса!");
             else
                 notification("Данные успешно изменены!");
-            dbConnection.Close();
+            reader.Close();
         }
 
         private void button1_Click(object sender, EventArgs e)

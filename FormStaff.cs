@@ -17,32 +17,32 @@ namespace AccessSherstnev
 
         void getData()
         {
-            string query = "SELECT Контракты.[Стоимость контракта], Контракты.[Начало контракта], Контракты.[Окончание контракта], Контракты.[Количество спектаклей], Контракты.[Премия по окончанию] FROM Актеры INNER JOIN Контракты ON Актеры.[Код актера] = Контракты.[Код актера] WHERE(((Актеры.[Код актера]) = " + user_id + "));";
+            string query = "SELECT \"CONTRACTS\".\"CONTRACT VALUE\", \"CONTRACTS\".\"CONTRACT ATART\", \"CONTRACTS\".\"CONTRACT END\", \"CONTRACTS\".\"NUMBER OF PERFORMANCES\", \"CONTRACTS\".\"AWARD AT THE END\" FROM \"ACTORS\" INNER JOIN \"CONTRACTS\" ON \"ACTORS\".\"ACTOR CODE\" = \"CONTRACTS\".\"ACTOR CODE\" WHERE(((\"ACTORS\".\"ACTOR CODE\") = " + user_id + "))";
             string[] dataName = new string[5]
             {
-                "Стоимость контракта",
-                "Начало контракта",
-                "Окончание контракта",
-                "Количество спектаклей",
-                "Премия по окончанию",
+                "CONTRACT VALUE",
+                "CONTRACT ATART",
+                "CONTRACT END",
+                "NUMBER OF PERFORMANCES",
+                "AWARD AT THE END",
             };
             DataAccessLight dataContracts = new DataAccessLight(query, dataName, connection, true, false);
 
             dataContracts.getDataGrid(ref dataGridView1);
 
-            query = "SELECT Регалии.[Название регалии] FROM Регалии INNER JOIN(Актеры INNER JOIN[Регалии актеров] ON Актеры.[Код актера] = [Регалии актеров].[Код актера]) ON Регалии.Код = [Регалии актеров].[Код регалии] WHERE((Актеры.[Код актера]) = " + user_id + ")";
+            query = "SELECT \"REGALIA\".\"REGALIA NAME\" FROM \"REGALIA\" INNER JOIN(\"ACTORS\" INNER JOIN \"ACTORS REGALIA\" ON \"ACTORS\".\"ACTOR CODE\" = \"ACTORS REGALIA\".\"ACTOR CODE\") ON \"REGALIA\".\"CODE\" = \"ACTORS REGALIA\".\"REGALIA CODE\" WHERE((\"ACTORS\".\"ACTOR CODE\") = " + user_id + ")";
             dataName = new string[1]
             {
-                "Название регалии",
+                "REGALIA NAME",
             };
             DataAccessLight dataRegalies = new DataAccessLight(query, dataName, connection, true, false);
 
             dataRegalies.getListBox(ref listBox1);
 
-            query = "SELECT Спектакли.[Дата спектакля] FROM Спектакли INNER JOIN(((Актеры INNER JOIN Контракты ON Актеры.[Код актера] = Контракты.[Код актера]) INNER JOIN[Роли в спектаклях] ON Контракты.[Код контракта] = [Роли в спектаклях].[Код контракта]) INNER JOIN[Список ролей] ON[Роли в спектаклях].Код = [Список ролей].[Код роли]) ON Спектакли.[Код спектакля] = [Список ролей].[Код спектакля] WHERE((Актеры.[Код актера]) = " + user_id + ")";
+            query = "SELECT \"PERFORMANCES\".\"PERFORMANCE DATE\" FROM \"PERFORMANCES\" INNER JOIN(((\"ACTORS\" INNER JOIN \"CONTRACTS\" ON \"ACTORS\".\"ACTOR CODE\" = \"CONTRACTS\".\"ACTOR CODE\") INNER JOIN\"ROLES IN PERFORMANCES\" ON \"CONTRACTS\".\"CONTRACT CODE\" = \"ROLES IN PERFORMANCES\".\"CONTRACT CODE\") INNER JOIN \"LIST OF ROLES\" ON \"ROLES IN PERFORMANCES\".\"CODE\" = \"LIST OF ROLES\".\"ROLE CODE\") ON \"PERFORMANCES\".\"PERFORMANCE CODE\" = \"LIST OF ROLES\".\"PERFORMANCE CODE\" WHERE((\"ACTORS\".\"ACTOR CODE\") = " + user_id + ")";
             dataName = new string[1]
             {
-                "Дата спектакля",
+                "PERFORMANCE DATE",
             };
             DataAccessLight dataDates = new DataAccessLight(query, dataName, connection, true, false);
 

@@ -173,35 +173,9 @@ namespace AccessSherstnev
                     }
                 }
                 reader.Close();
+                connectionString.Close();
                 return;
             }
-
-/*            public void get(string query)
-            {
-                dbConnection = new OleDbConnection(this.connectionString);
-                dbConnection.Open();
-                OleDbCommand dbCommand = new OleDbCommand(query, dbConnection);
-                OleDbDataReader dbReader = dbCommand.ExecuteReader();
-                if (dbReader.HasRows == false && this.notification)
-                    notification("Данные не найдены!");
-                else
-                {
-                    foreach (List<string> item in data)
-                    {
-                        item.Clear();
-                    }
-                    while (dbReader.Read())
-                    {
-                        for (int i = 0; i < this.data.Count; i++)
-                        {
-                            this.data[i].Add(dbReader[dataName[i]].ToString());
-                        }
-                    }
-                }
-                dbReader.Close();
-                dbConnection.Close();
-                return;
-            }*/
 
             public bool add(string index)
             {
@@ -286,7 +260,7 @@ namespace AccessSherstnev
                             break;
                         case DataType.BOOLEAN:
                             CheckBox checkBox = new CheckBox();
-                            if (data[i][int.Parse(index)] == "True")
+                            if (data[i][int.Parse(index)] == "1")
                             {
                                 checkBox.Checked = true;
                             }
@@ -341,15 +315,17 @@ namespace AccessSherstnev
                     OracleCommand dbcmd = new OracleCommand(query, connectionString);
                     dbcmd.CommandType = CommandType.Text;
                     OracleDataReader reader = dbcmd.ExecuteReader();
-                    if (reader.FieldCount != 1)
+                    if (reader.HasRows)
                         notification("Ошибка выполнения запроса!");
                     else
                         notification("Данные успешно удалены!");
                     reader.Close();
+                    connectionString.Close();
                     return true;
                 }
                 else
                 {
+                    connectionString.Close();
                     return false;
                 }
 

@@ -139,7 +139,7 @@
     <value>0</value>
   </data>
   <data name="Фамилия.Text" xml:space="preserve">
-    <value>Петров</value>
+    <value>Petrov</value>
   </data>
   <data name="Фамилия.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -175,7 +175,7 @@
     <value>1</value>
   </data>
   <data name="Имя.Text" xml:space="preserve">
-    <value>Петр</value>
+    <value>Petr</value>
   </data>
   <data name="Имя.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
@@ -211,7 +211,7 @@
     <value>2</value>
   </data>
   <data name="Отчество.Text" xml:space="preserve">
-    <value>Петрович</value>
+    <value>Petrovich</value>
   </data>
   <data name="Отчество.Visible" type="System.Boolean, mscorlib">
     <value>False</value>

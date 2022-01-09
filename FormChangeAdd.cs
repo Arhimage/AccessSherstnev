@@ -70,11 +70,12 @@ namespace AccessSherstnev
             OracleCommand dbcmd = new OracleCommand(query, connectionString);
             dbcmd.CommandType = CommandType.Text;
             OracleDataReader reader = dbcmd.ExecuteReader();
-            if (reader.FieldCount != 1)
+            if (reader.HasRows)
                 notification("Ошибка выполнения запроса!");
             else
                 notification("Данные успешно добавлены!");
             reader.Close();
+            connectionString.Close();
         }
 
         private void editNote()
@@ -84,7 +85,7 @@ namespace AccessSherstnev
             for (int i = 0; i < dataType.Length - 1; i++)
             {
                 int j = i * 2 + 1;
-                saveData += "[" + tableSave + "].[" + dataName[i + 1] + "] = ";
+                saveData += "\"" + tableSave + "\".\"" + dataName[i + 1] + "\" = ";
                 switch (dataType[i + 1])
                 {
                     case DataType.STRING:
@@ -127,11 +128,12 @@ namespace AccessSherstnev
             OracleCommand dbcmd = new OracleCommand(query, connectionString);
             dbcmd.CommandType = CommandType.Text;
             OracleDataReader reader = dbcmd.ExecuteReader();
-            if (reader.FieldCount != 1)
+            if (reader.HasRows)
                 notification("Ошибка выполнения запроса!");
             else
                 notification("Данные успешно изменены!");
             reader.Close();
+            connectionString.Close();
         }
 
         private void button1_Click(object sender, EventArgs e)

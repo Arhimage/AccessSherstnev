@@ -52,16 +52,16 @@ namespace AccessSherstnev
 
             string[] dataNames = new string[7]
             {
-                "Код контракта",
-                "Код актера",
-                "Стоимость контракта",
-                "Начало контракта",
-                "Окончание контракта",
-                "Количество спектаклей",
-                "Премия по окончанию",
+                "CONTRACT CODE",
+                "ACTOR CODE",
+                "CONTRACT VALUE",
+                "CONTRACT ATART",
+                "CONTRACT END",
+                "NUMBER OF PERFORMANCES",
+                "AWARD AT THE END",
             };
 
-            string table = "Контракты";
+            string table = "CONTRACTS";
 
             dataContracts = new DataAccess(dataTypes, dataNames, table, connection, true);
 
@@ -81,15 +81,15 @@ namespace AccessSherstnev
 
             dataNames = new string[6]
             {
-                "Код актера",
-                "Фамилия",
-                "Имя",
-                "Отчество",
-                "Стаж",
-                "Управляющий",
+                "ACTOR CODE",
+                "SURNAME",
+                "NAME",
+                "PATRONYMIC",
+                "SENIORITY",
+                "MANAGER",
             };
 
-            table = "Актеры";
+            table = "ACTORS";
 
             dataActors = new DataAccess(dataTypes, dataNames, table, connection, true);
 
@@ -105,11 +105,11 @@ namespace AccessSherstnev
 
             dataNames = new string[2]
             {
-                "Код",
-                "Название регалии",
+                "CODE",
+                "REGALIA NAME",
             };
 
-            table = "Регалии";
+            table = "REGALIA";
 
             dataRegalies = new DataAccess(dataTypes, dataNames, table, connection, true);
 
@@ -129,15 +129,15 @@ namespace AccessSherstnev
 
             dataNames = new string[6]
             {
-                "Код",
-                "Название постановки",
-                "Начало показа",
-                "Завершение показа",
-                "Описание постановки",
-                "Ссылка на картинку",
+                "CODE",
+                "NAME OF THE PRODUCTION",
+                "START OF THE SHOW",
+                "END OF THE SHOW",
+                "DESCRIPTION OF THE PRODUCTION",
+                "LINK TO THE PICTURE",
             };
 
-            table = "Репертуар театра";
+            table = "REPERTOIRE OF THE THEATER";
 
             dataRepertuar = new DataAccess(dataTypes, dataNames, table, connection, true);
 
@@ -155,13 +155,13 @@ namespace AccessSherstnev
 
             dataNames = new string[4]
             {
-                "Код спектакля",
-                "Код постановки",
-                "Дата спектакля",
-                "Бюджет",
+                "PERFORMANCE CODE",
+                "PRODUCTION CODE",
+                "PERFORMANCE DATE",
+                "BUDGET",
             };
 
-            table = "Спектакли";
+            table = "PERFORMANCES";
 
             dataPerformance = new DataAccess(dataTypes, dataNames, table, connection, true);
 
@@ -245,12 +245,12 @@ namespace AccessSherstnev
         {
             string [] dataName = new string [3]
             {
-                "Дата спектакля",
-                "Бюджет",
-                "Название постановки",
+                "PERFORMANCE DATE",
+                "BUDGET",
+                "NAME OF THE PRODUCTION",
             };
 
-            string query = "SELECT Спектакли.[Дата спектакля], Спектакли.Бюджет, [Репертуар театра].[Название постановки] FROM[Репертуар театра] INNER JOIN Спектакли ON[Репертуар театра].Код = Спектакли.[Код постановки] WHERE(((Спектакли.[Дата спектакля]) Between #" + DateTime.Parse(ДатаС.Text).ToString("dd-MM-yyyy") + "# And #" + DateTime.Parse(ДатаПо.Text).ToString("dd-MM-yyyy") + "#))";
+            string query = "SELECT \"PERFORMANCES\".\"PERFORMANCE DATE\", \"PERFORMANCES\".\"BUDGET\", \"REPERTOIRE OF THE THEATER\".\"NAME OF THE PRODUCTION\" FROM \"REPERTOIRE OF THE THEATER\" INNER JOIN \"PERFORMANCES\" ON \"REPERTOIRE OF THE THEATER\".\"CODE\" = \"PERFORMANCES\".\"PRODUCTION CODE\" WHERE(((\"PERFORMANCES\".\"PERFORMANCE DATE\") BETWEEN TO_DATE('" + DateTime.Parse(ДатаС.Text).ToString("yyyy-MM-dd") + "', 'YYYY-MM-DD') AND TO_DATE('" + DateTime.Parse(ДатаПо.Text).ToString("yyyy-MM-dd") + "', 'YYYY-MM-DD')))";
 
             DataAccessLight dataAccess = new DataAccessLight(query, dataName, connection, true, true);
 

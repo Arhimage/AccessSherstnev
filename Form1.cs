@@ -26,31 +26,39 @@ namespace AccessSherstnev
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string query = "SELECT Актеры.[Код актера], Актеры.Управляющий FROM Актеры WHERE(((Актеры.Фамилия) = '" + Фамилия.Text + "') AND((Актеры.Имя) = '" + Имя.Text + "') AND((Актеры.Отчество) = '" + Отчество.Text + "'))";
+            string query = "SELECT \"ACTORS\".\"ACTOR CODE\", \"ACTORS\".\"MANAGER\" FROM \"ACTORS\" WHERE \"ACTORS\".\"SURNAME\" = '" + Фамилия.Text + "' AND \"ACTORS\".\"NAME\" = '" + Имя.Text + "' AND \"ACTORS\".\"PATRONYMIC\" = '" + Отчество.Text + "'";
             string[] dataName = new string[2]
             {
-                "Код актера",
-                "Управляющий",
+                "ACTOR CODE",
+                "MANAGER",
             };
             DataAccessLight dataAccessLight = new DataAccessLight(query, dataName, connection, true, false);
             List<List<string>> data = dataAccessLight.getData();
-            user_id = int.Parse(data[0][0]);
-            string status = data[1][0];
-            if (status == "False")
+            try
             {
-                FormStaff fs = new FormStaff();
-                fs.user_id = user_id.ToString();
-                fs.FormClosed += new FormClosedEventHandler(show);
-                fs.Show();
-                this.Hide();
+                user_id = int.Parse(data[0][0]);
+                string status = data[1][0];
+                if (status == "0")
+                {
+                    FormStaff fs = new FormStaff();
+                    fs.user_id = user_id.ToString();
+                    fs.FormClosed += new FormClosedEventHandler(show);
+                    fs.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    FormAdmin fa = new FormAdmin();
+                    fa.FormClosed += new FormClosedEventHandler(show);
+                    fa.Show();
+                    this.Hide();
+                }
             }
-            else
+            catch (Exception)
             {
-                FormAdmin fa = new FormAdmin();
-                fa.FormClosed += new FormClosedEventHandler(show);
-                fa.Show();
-                this.Hide();
+                notification("Имена пользователей работают только в режиме английского языка!");
             }
+
         }
 
         private void button2_Click(object sender, EventArgs e)

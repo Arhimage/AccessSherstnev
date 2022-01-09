@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using static AccessSherstnev.Globals;
 using static AccessSherstnev.OracleData;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AccessSherstnev
 {
@@ -59,6 +60,20 @@ namespace AccessSherstnev
             }
         }
 
+        async void setImage(PictureBox pictureBox, string imgWay)
+        {
+            try
+            {
+                await Task.Run(() => pictureBox.Load(imgWay));
+            }
+            catch (Exception)
+            {
+
+                await Task.Run(() => pictureBox.Load("https://aspromed.ru/media/thumbs/product_images/fallback_image.jpg.180x180_q85.png"));
+            }
+            
+        }
+
         bool releaseTable(string number, string name, string imgWay = "https://aspromed.ru/media/thumbs/product_images/fallback_image.jpg.180x180_q85.png")
         {
             Label label = new Label();
@@ -80,14 +95,7 @@ namespace AccessSherstnev
             PictureBox pictureBox = new PictureBox();
             pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox.Dock = DockStyle.Fill;
-            try
-            {
-                pictureBox.Load(imgWay);
-            }
-            catch (Exception)
-            {
-                pictureBox.Image = Image.FromFile(imgWay);
-            }
+            setImage(pictureBox, imgWay);
 
             TableLayoutPanel table = new TableLayoutPanel();
             table.Dock = DockStyle.Fill;
